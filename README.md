@@ -1,2 +1,3 @@
-# STT3030
-STT3030 Apprentissage statistique
+# STT3030 Apprentissage statistique, Automne 2024
+
+
