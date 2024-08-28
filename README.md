@@ -14,7 +14,7 @@ selon [UQAM](https://etudier.uqam.ca/cours?sigle=STT3030), les préalables sont 
 
 **Codes**
 * [https://rmarkdown.rstudio.com/](https://rmarkdown.rstudio.com/lesson-1.html)
-* Lab1: [lab1.R](/devoir/lab1.R), [lab1.rmd](/devoir/lab1.rmd), [lab1.md](/devoir/lab1.md), 
+* Lab1: [lab1.R](/lab/lab1.R), [lab1.rmd](/lab/lab1.rmd), [lab1.md](/lab/lab1.md), 
 
 **Cours**
 * Cours1: [cours1.pdf](/docs/cours1.pdf),
