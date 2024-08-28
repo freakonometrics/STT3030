@@ -1,0 +1,143 @@
+---
+title: "STT3030 Lab 1"
+output: rmarkdown::github_document
+date: "2024"
+---
+
+```{r}
+getwd()
+```
+
+```{r}
+resultat = sin(sqrt(1:10))
+resultat = vector(mode="numeric", length = 10L)
+for (i in 1:length(resultat)) {
+   resultat[i] = sin(sqrt(i))
+}
+```
+
+```{r}
+library("exactRankTests")
+?exactRankTests::perm.test
+?perm.test
+```
+
+```{r}
+# Sample data
+x <- c(1, 2, 3, 4, 5)
+y <- c(6, 7, 8, 9, 10)
+
+# Function to perform permutation test
+permutation_test <- function(x, y, num_permutations = 10000) {
+  # Combine the data
+  combined <- c(x, y)
+  n_x <- length(x)
+  n_y <- length(y)
+  
+  # Calculate the observed difference in means
+  observed_diff <- mean(x) - mean(y)
+  
+  # Initialize a vector to store the permutation differences
+  perm_diffs <- numeric(num_permutations)
+  
+  # Perform the permutations
+  for (i in 1:num_permutations) {
+    # Permute the combined data
+    permuted <- sample(combined)
+    
+    # Split the permuted data into two new samples
+    perm_x <- permuted[1:n_x]
+    perm_y <- permuted[(n_x + 1):(n_x + n_y)]
+    
+    # Calculate the difference in means for the permuted samples
+    perm_diffs[i] <- mean(perm_x) - mean(perm_y)
+  }
+  
+  # Calculate the p-value
+  p_value <- mean(abs(perm_diffs) >= abs(observed_diff))
+  
+  # Return the observed difference and p-value
+  list(observed_diff = observed_diff, p_value = p_value)
+}
+
+# Run the permutation test
+result <- permutation_test(x, y)
+print(result)
+```
+
+```{r}
+# install.packages("coin")
+# Load the coin package
+library(coin)
+
+# Sample data
+x <- c(1, 2, 3, 4, 5)
+y <- c(6, 7, 8, 9, 10)
+
+# Combine the data into a data frame
+data <- data.frame(
+  values = c(x, y),
+  group = factor(rep(c("x", "y"), times = c(length(x), length(y))))
+)
+
+# Perform the permutation test
+result <- oneway_test(values ~ group, data = data, distribution = "approximate")
+
+# Print the result
+print(result)
+```
+
+```{r}
+x = rnorm(10)
+y = rnorm(10)
+data <- data.frame(
+     values = c(x, y),
+     group = factor(rep(c("x", "y"), times = c(length(x), length(y))))
+ )
+result <- oneway_test(values ~ group, data = data, distribution = "approximate")
+result
+str(result)
+```
+
+```{r}
+# Install and load necessary packages
+if (!requireNamespace("osmdata", quietly = TRUE)) {
+  install.packages("osmdata")
+}
+if (!requireNamespace("sf", quietly = TRUE)) {
+  install.packages("sf")
+}
+if (!requireNamespace("mapview", quietly = TRUE)) {
+  install.packages("mapview")
+}
+
+library(osmdata)
+library(sf)
+library(mapview)
+
+# Define the bounding box for Montréal, QC
+montréal_bbox <- getbb("Montréal, Québec")
+
+# Query OSM for all Jean Coutu locations in Montréal
+jean_coutu_query <- opq(bbox = montréal_bbox) %>%
+  add_osm_feature(key = "name", value = "Jean Coutu")
+
+# Extract data
+jean_coutu_data <- osmdata_sf(jean_coutu_query)
+
+# Check the structure of the returned data
+print(names(jean_coutu_data))
+
+# Extract the points data (store locations)
+jean_coutu_locations <- jean_coutu_data$osm_points
+
+# Visualize the locations on a map using mapview
+# mapview(jean_coutu_locations)
+```
+
+```{r}
+regression = lm(dist ~ speed, data = cars)
+str(regression)
+summary(regression)$sigma
+sqrt(sum(regression$residuals^2)/regression$df.residual)
+```
