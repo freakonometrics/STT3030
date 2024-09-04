@@ -22,4 +22,4 @@ selon [UQAM](https://etudier.uqam.ca/cours?sigle=STT3030), les préalables sont 
 
 **Cours**
 Les notes de cours sont très librement inspirées des notes de cours de Cédric Beaulac,
-* Cours1: [cours1.pdf](/docs/cours1.pdf),
+* Cours1: [cours1.pdf](/docs/STT3030-1.pdf),
