@@ -18,8 +18,13 @@ selon [UQAM](https://etudier.uqam.ca/cours?sigle=STT3030), les préalables sont 
 
 **Codes**
 * [https://rmarkdown.rstudio.com/](https://rmarkdown.rstudio.com/lesson-1.html)
-* Lab1: [STT3030-Lab1.pdf](/lab/STT3030-Lab1.pdf), [lab1.R](/lab/lab1.R), [lab1.rmd](/lab/lab1.rmd), [lab1.md](/lab/lab1.md), 
+* Lab1: [STT3030-Lab1.pdf](/lab/STT3030-Lab1.pdf), [lab1.R](/lab/lab1.R), [lab1.rmd](/lab/lab1.rmd), [lab1.md](/lab/lab1.md),
+* Lab2: [STT3030-Lab2.pdf](/lab/STT3030-Lab2.pdf), [lab2.R](/lab/lab2.R), [lab2.rmd](/lab/lab2.rmd), [lab2.md](/lab/lab2.md),
+* Lab3: [STT3030-Lab3.pdf](/lab/STT3030-Lab3.pdf), [lab3.R](/lab/lab3.R), [lab3.rmd](/lab/lab3.rmd), [lab3.md](/lab/lab3.md),
+* Lab4: [STT3030-Lab4.pdf](/lab/STT3030-Lab4.pdf), [lab4.R](/lab/lab4.R), [lab4.rmd](/lab/lab4.rmd), [lab4.md](/lab/lab4.md), 
 
 **Cours**
 Les notes de cours sont très librement inspirées des notes de cours de Cédric Beaulac,
 * Cours1: [cours1.pdf](/docs/STT3030-1.pdf),
+* Cours2: [cours2.pdf](/docs/STT3030-2.pdf),
+* Cours3: [cours3.pdf](/docs/STT3030-3.pdf),
