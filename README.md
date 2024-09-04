@@ -21,4 +21,5 @@ selon [UQAM](https://etudier.uqam.ca/cours?sigle=STT3030), les préalables sont 
 * Lab1: [STT3030-Lab1.pdf](/lab/STT3030-Lab1.pdf), [lab1.R](/lab/lab1.R), [lab1.rmd](/lab/lab1.rmd), [lab1.md](/lab/lab1.md), 
 
 **Cours**
+Les notes de cours sont très librement inspirées des notes de cours de Cédric Beaulac,
 * Cours1: [cours1.pdf](/docs/cours1.pdf),
