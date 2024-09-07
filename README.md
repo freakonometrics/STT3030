@@ -5,7 +5,7 @@ Arthur Charpentier, professeur
 Plan de cours : [Plan_Cours_STT3030_A2024.pdf](/docs/Plan_Cours_STT3030_A2024.pdf) (version non approuvée)
 
 ```diff
-- Les slides et les codes seront mis en ligne au fur et à mesure du cours
+- Les codes pour récupérer les données pour le devoir sont en ligne
 ```
 
 **Prérequis**
@@ -15,6 +15,10 @@ selon [UQAM](https://etudier.uqam.ca/cours?sigle=STT3030), les préalables sont 
 **Ouvrage de référence**
 
 [An Introduction to Statistical Learning](https://hastie.su.domains/ISLR2/ISLRv2_corrected_June_2023.pdf.download.html)
+
+**Devoir**
+
+* Données: [stt3030-A2024.md](/devoir/stt3030-A2024.md),
 
 **Codes**
 * [https://rmarkdown.rstudio.com/](https://rmarkdown.rstudio.com/lesson-1.html)
