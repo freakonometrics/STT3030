@@ -1,0 +1,634 @@
+---
+title: "STT3030 Lab 2"
+output: pdf_document
+date: "2024"
+---
+
+# Régression linéaire et Classification linéaire
+
+## Options par défaut des blocs de code R
+
+Cette option spécifie que le code source R sera affiché dans le document généré.
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Répertoire de travail
+
+```{r}
+getwd()
+# A modifier:
+setwd("...")
+```
+
+## Installation des packages
+
+Une fois installés dans votre environnement, vous n'avez plus besoin d'utiliser ces commandes.
+
+```{r}
+install.packages("MASS")
+install.packages("ISLR")
+install.packages("nnet")
+install.packages("ggplot2")
+```
+
+## Chargement des packages
+
+```{r}
+library(MASS)
+library(ISLR)
+library(nnet)
+library(ggplot2)
+```
+
+## Visualisation d'un jeu de données
+
+On commence par visualiser les premières lignes du jeu de données Boston, disponible dans la librairie "MASS". La variable sortie $Y$ correspond à "medv" (median house value in Boston for 506 census tracts in Boston). On essaiera de prédire $Y$ à l'aide de plusieurs variables explicatives: "rm" (average number of rooms per house), "age" (average age of houses), et "lstat" (percent of households with low socioeconomic status).
+
+```{r}
+?Boston
+head(Boston)
+```
+
+Type d'objet sous R du jeu de données Boston:
+```{r}
+class(Boston)
+```
+
+Sur R, les matrices "matrix" ou dataframes "data.frame", sont des structures de données bidimensionnelles, c'est-à-dire comportant un nombre de lignes et un nombre de colonnes. Tous les éléments d'une matrice doivent être du même type de données (par exemple, tous numériques, tous caractères, etc.). Au contraire, un objet de type "data.frame" peut contenir des colonnes de types de données différents.
+
+Combien y a-t-il d'observations dans ce jeu de données, noté $n$ ? Et, combien de variables explicatives disposons-nous pour prédire $Y$ ?
+```{r}
+n <- ...
+p <- ...
+
+cat("Nombre d'observations:", n, "\n")
+cat("Nombre de variables explicatives:", p, "\n")
+```
+
+Données manquantes ?
+
+```{r}
+na_values <- sum(is.na(Boston))
+cat("Nombre d'observations avec des données manquantes:", na_values, "\n")
+```
+
+Histogramme de la variable à prédire medv avec un nombre de "breaks" égal à 20:
+
+```{r}
+hist(Boston$medv, breaks = 20, main = "Histogramme de medv", xlab = "medv")
+```
+
+A l'exception de medv, y a-t-il dans le jeu de données de Boston une variable quantitative ? Une variable qualitative ? Si oui, quel est son nombre de catégories ?
+
+```{r}
+str(Boston) # me donne le type de chaque colonne
+?Boston # me donne les informations sur les variables
+```
+
+Il n'y a que deux variables qualitatives: "chas" (variable binaire) et "rad" (variable multi-classes):
+
+```{r}
+unique(Boston$chas)
+k1 <- length(unique(Boston$chas))
+cat("Nombre de catégories de la variable chas:", ..., "\n")
+
+unique(Boston$rad)
+k2 <- length(unique(Boston$rad))
+cat("Nombre de catégories de la variable rad:", ..., "\n")
+```
+
+## Régression linéaire sur medv
+
+Séparez aléatoirement le jeu de données Boston en un échantillon d'entraînement (80%) et un échantillon de test (20%) à l'aide de la fonction "sample". Pour cela dans un premier temps, on fixe le "seed" afin d'être en mesure de retrouver nos résultats si on relance le script R plusieurs fois.
+
+```{r}
+set.seed(2024)
+
+# Proportion de données dans la base d'entraînement
+prop <- 0.8
+prop*nrow(Boston)
+n_a <- round(prop*nrow(Boston)) # on utilise round pour avoir un nombre entier
+n_a
+
+# Mélange des numéros de lignes de Boston
+id <- sample(...)
+
+Boston_a <- Boston[id[1:n_a],] # échantillon d'entraînement
+Boston_t <- Boston[id[(n_a+1):nrow(Boston)],] # échantillon de test
+```
+
+Vérifiez que vous obtenez les bonnes proportions, 80%/20%, sur les échantillons d'entraînement et de test:
+
+```{r}
+cat("Proportion de données d'entraînement:", ..., "%", "\n")
+cat("Proportion de données de test:", ..., "%", "\n")
+```
+
+Définissez une fonction permettant de calculer l'EQM prenant en argument deux vecteurs de données: "y" pour les valeurs observées de $Y$ et "preds" pour prédictions.
+
+```{r}
+calcul_EQM <- function(y, preds){
+  eqm <- ...
+  eqm
+  # ou 
+  # return(eqm) # comme en Python
+}
+```
+
+Par la suite, on calculera l'EQM sur les données de test et d'entraînement pour chaque modèle de régression.
+
+### Régression linéaire simple avec lsat
+
+Entraînez un modèle de régression linéaire simple sur les données d'entraînement en prenant comme seule variable explicative "lstat" (variable numérique). Affichez le résumé du modèle.
+
+```{r}
+fit_1 <- lm(...)
+summary(fit_1)
+```
+
+Affichez les deux coefficients du modèle linéaire ainsi qu'un intervalle de confiance au niveau de confiance 95% sur chacun des coefficients à l'aide de la fonction "confint":
+
+```{r}
+# Coefficients
+fit_1$coefficients
+# Intervalles de confiance à 95%
+...
+```
+
+Prédire le modèle sur les données de test:
+
+1)  Calculez les prédictions à la main puis affichez les 5 premières prédictions:
+
+```{r}
+b0 <- ...
+b1 <- ...
+preds_1 <- b0 + b1 * Boston_t$lstat
+preds_1[1:5]
+```
+
+2)  Calculez les prédictions à l'aide de la fonction "predict" et comparez les valeurs avec 1):
+
+```{r}
+preds_1 <- predict(...)
+preds_1[1:5]
+```
+
+On peut désormais afficher le graphe de la droite des moindres carrés ainsi que les coordonnées des points contenus dans les échantillons d'apprentissage et de test. Ajoutez une légende à ce graphique afin d'indiquer le nom des échantillons et les couleurs associés.
+
+```{r}
+plot(Boston_a$lstat, Boston_a$medv, pch = 20, col = "coral1",
+     xlab = "lsat", ylab = "medv")
+lines(Boston$lstat, b0 + b1*Boston$lstat, col = "brown4", lwd = 2)
+points(Boston_t$lstat, Boston_t$medv, col = "blue", pch = 19, lwd = 2)
+legend(...)
+```
+
+Calculez l'EQM sur les données d'entraînement et les données de test:
+
+```{r}
+cat("EQM pour les données d'entraînement:", 
+    round(calcul_EQM(Boston_a$medv, fit_1$fitted.values), 2), "\n")
+# ou
+# cat("EQM pour les données d'entraînement:", 
+#    calcul_EQM(Boston_a$medv, predict(fit_1, newdata = Boston_a)), "\n")
+
+cat("EQM pour les données de test:", 
+    round(calcul_EQM(...), 2), "\n")
+```
+
+On peut également calculer des intervalles de prédiction au niveau de confiance 95% pour les prédictions sur les données de l'échantillon de test.
+
+```{r}
+pred_int <- predict(fit_1, Boston_t, interval ="prediction")
+pred_int[1:5,]
+```
+
+### Ajout de la variable qualitative "chas"
+
+Entraînez un modèle de régression linéaire avec les variables "lstat" et "chas" sur les données d'entraînement, sans intéractions. Affichez le résumé du modèle.
+
+On commence par indiquer à R que la variable "chas" est catégorielle:
+
+```{r}
+Boston$chas <- as.factor(Boston$chas)
+Boston_a$chas <- ...
+Boston_t$chas <- ...
+```
+
+Quelles sont les deux modalités de cette variable ?
+
+```{r}
+unique(...)
+```
+
+On peut désormais apprendre le modèle linéaire en spécifiant les variables à utiliser:
+
+```{r}
+fit_2 <- lm(...)
+summary(fit_2)
+```
+
+Quelle est la modalité de référence de la variable chas dans ce modèle ? 
+
+La modalité 0 est la "baseline" pour la variable "chas" car il s'agit de la première valeur affichée comme "levels":
+
+```{r}
+levels(Boston$chas)
+```
+
+Il est possible de changer cette modalité de référence en modifiant l'ordre de ces "levels". Cela changera ainsi la modalité de référence dans le modèle linéaire.
+
+```{r}
+chas_modif <- factor(Boston$chas, levels = c("1", "0"))
+levels(chas_modif)
+```
+
+Prédire le modèle sur les données de test:
+
+1)  Calculez les prédictions à la main puis affichez les 5 premières prédictions:
+
+```{r}
+b0 <- ...
+b1 <- ...
+a1 <- ...
+# Le modèle dépend désormais de la modalité de la variable chas
+preds_2 <- b0 + b1 *Boston_t$lstat + a1 * as.numeric(Boston_t$chas == "1")
+preds_2[1:5]
+```
+
+2)  Calculez les prédictions à l'aide de la fonction "predict" et comparez les valeurs avec 1):
+
+```{r}
+preds_2 <- predict(...)
+preds_2[1:5]
+```
+
+On peut désormais afficher le modèle linéaire appris (i.e. les deux droites obtenues) ainsi que les données de test ("medv" en fonction de "lstat"), en différenciant par couleur sur "chas".
+
+```{r}
+df <- data.frame(medv = Boston_t$medv, lsat = Boston_t$lstat, 
+                 chas = Boston_t$chas, medv_pred = preds_2)
+ggplot(df, aes(x = lsat, y = medv, color = chas)) +
+  geom_point() +
+  geom_line(aes(y = medv_pred), linewidth = 1) +  
+  scale_color_manual(values = c("0" = "coral1", "1" = "darkorchid")) +
+  labs(x = "lsat",
+       y = "medv") +
+  theme_minimal()
+```
+
+Calculez l'EQM sur les données d'entraînement et les données de test:
+
+```{r}
+cat("EQM pour les données d'entraînement:", 
+    round(calcul_EQM(...), 2), "\n")
+
+cat("EQM pour les données de test:", 
+    round(calcul_EQM(...), 2), "\n")
+```
+
+### Ajout d'un terme d'intéraction entre "lsat" et "chas"
+
+Entraînez un modèle de régression linéaire avec les variables "lstat" et "chas" sur les données d'entraînement, avec intéraction. Affichez le résumé du modèle.
+
+```{r}
+fit_3 <- lm(...)
+summary(fit_3)
+```
+
+Prédire le modèle sur les données de test:
+
+1)  Calculez les prédictions à la main puis affichez les 5 premières prédictions:
+
+```{r}
+b0 <- ...
+b1 <- ...
+a1 <- ...
+gamma <- ...
+# Le modèle dépend de la modalité de la variable chas
+preds_3 <- b0 + b1 * Boston_t$lstat + a1 * as.numeric(Boston_t$chas == "1") +
+  gamma * ...
+preds_3[1:5]
+```
+
+2)  Calculez les prédictions à l'aide de la fonction "predict" et comparez les valeurs avec 1):
+
+```{r}
+preds_3 <- predict(...)
+preds_3[1:5]
+```
+
+On peut désormais afficher le modèle linéaire appris (i.e. les deux droites obtenues) ainsi que les données de test ("medv" en fonction de "lstat"), en différenciant par couleur sur "chas".
+
+```{r}
+df <- data.frame(medv = Boston_t$medv, lsat = Boston_t$lstat, 
+                 chas = Boston_t$chas, medv_pred = preds_3)
+ggplot(df, aes(x = lsat, y = medv, color = chas)) +
+  geom_point() +
+  geom_line(aes(y = medv_pred), size = 1) +  
+  scale_color_manual(values = c("0" = "coral1", "1" = "darkorchid")) +
+  labs(x = "lsat",
+       y = "medv") +
+  theme_minimal()
+```
+
+En ajoutant un terme d'intéraction, on modifie la pente de la droite des moindres carrés initiale dans le groupe "chas" = 1.
+
+Calculez l'EQM sur les données d'entraînement et les données de test:
+
+```{r}
+cat("EQM pour les données d'entraînement:", 
+    round(calcul_EQM(...), 2), "\n")
+
+cat("EQM pour les données de test:", 
+    round(calcul_EQM(...), 2), "\n")
+```
+
+On peut se demander si l'ajout de cette intéraction est importante pour prédire "medv" à l'aide du test anova.
+
+```{r}
+anova(fit_2, fit_3)
+```
+
+L'hypothèse nulle est que les deux modèles (fit_2 et fit_3) s'ajustent aux données de manière équivalente, et l'hypothèse alternative est que le modèle complet (fit_3) est supérieur. Ici, la statistique F est de 2.96 et la p-value associée est supérieure à 0.05. Ainsi, on ne peut pas rejeter l'hypothèse nulle. Il ne semble donc pas utile d'inclure le terme d'intéraction entre "lstat" et "chas" dans le modèle afin de prédire au mieux "medv".
+
+### Régression linéaire multiple
+
+```{r}
+fit_4 <- lm(medv ~ ., data = Boston_a)
+summary(fit_4)
+```
+
+En vue des p-values, quelles variables vous semblent le plus significatives ?
+
+Prédire le modèle sur les données de test à l'aide de la fonction "predict":
+
+```{r}
+preds_4 <- ...
+```
+
+Calculez l'EQM sur les données d'entraînement et les données de test:
+
+```{r}
+cat("EQM pour les données d'entraînement:", 
+    round(..., 2), "\n")
+
+cat("EQM pour les données de test:", 
+    round(..., 2), "\n")
+```
+
+### Régression linéaire multiple avec intéractions
+
+```{r}
+fit_5 <- lm(medv ~ .^2, data = Boston_a) # Pour ajouter les intéractions de degré 2
+summary(fit_5)
+```
+
+Combien le modèle a-t-il appris de paramètres ?
+
+```{r}
+...
+```
+
+Il pourrait être utile de faire de la sélection de variables ici.
+
+### Corrélation entre variables explicatives
+
+On va se concentrer désormais sur le modèle contenant les variables explicatives "nox", "age" et "ptratio", afin de prédire "mdev".
+
+Calculez la corrélation de Pearson (linéaire) entre toutes les combinaisons de deux variables:
+
+```{r}
+?cor
+cor(Boston$age, Boston$nox, method = "pearson")
+cor(..., method = "pearson")
+cor(...)
+```
+
+Construisez le modèle linéaire avec ces trois variables et observez la significativité:
+
+```{r}
+fit_6 <- ...
+summary(fit_6)
+```
+
+La variable "age" ne semble pas significative dans ce modèle.
+
+Supprimons la variable "nox" du modèle linéaire et observons une nouvelle fois la significativité:
+
+```{r}
+fit_7 <- ...
+summary(fit_7)
+```
+
+Cette fois-ci, la variable "age" est significative. Ainsi, pour la prédiction, les variables inutiles/corrélées sont nuisibles. Dans ce cas, il peut être utile de choisir une seule variable explicative parmi les deux corrélées. La sélection de variables sera au coeur du prochain cours.
+
+## Régression polynomiale
+
+Etudions la relation entre les variables "lstat" et "medv". On commence par afficher le graphique représentant la variable "medv" en fonction de la variable "lstat" pour toutes les observations du jeu de données Boston.
+
+```{r}
+plot(..., pch = 20, xlab = "lstat", ylab = "medv")
+```
+
+Il semble que la relation ne soit pas linéaire entre les valeurs 0 et 10 de la variable "lstat". On peut également l'observer à l'aide du graphique "Residuals vs Fitted" du modèle linéaire entre "lstat" et "medv":
+
+```{r}
+plot(fit_1)
+```
+
+Ainsi, incluons un degré de plus pour la variable "lstat":
+
+```{r}
+fit_8 <- lm(medv ~ lstat+I(lstat^2), data = Boston_a) # Polynôme de degré 2 pour lstat
+# ou
+# fit_8 <- lm(medv ~ poly(lstat, 2, raw=TRUE), data = Boston_a)
+summary(fit_8) 
+```
+
+On peut une nouvelle fois réaliser un test anova afin de comparer ce modèle avec le modèle linéaire simple entre "medv" et "lstat".
+
+```{r}
+anova(...)
+```
+
+Ici, la statistique F est de 98.3 et la p-value associée est pratiquement nulle. Ainsi, on peut rejeter l'hypothèse nulle et considérer que le modèle contenant les prédicteurs "lstat" et "lstat"\^2 est supérieur au modèle qui ne contient que le prédicteur "lstat".
+
+On peut également introduire un degré plus élevé sur "lstat". Par exemple, considérons d = 5:
+
+```{r}
+fit_9 <- lm(medv ~ poly(lstat, 5, raw = TRUE), data = Boston_a)
+summary(fit_9)
+```
+
+## Régression logistique
+
+On s'intéresse désormais au jeu de données "Smarket" disponible dans la librairie "ISLR" sous R.
+
+```{r}
+?Smarket # Pour avoir les informations sur le jeu de données
+head(Smarket)
+```
+
+Ici, on cherche à prédire la variable "Direction".
+
+Quel est le type de cette variable ?
+
+```{r}
+...
+```
+
+Quelles sont les différentes modalités de cette variable ? Et, selon R, quelle est la modalité de référence ?
+
+```{r}
+unique(...)
+```
+
+Comme dans la partie précédente, on commence par diviser le dataset en deux échantillons: entraînement et test. Nous n'avons pas besoin de reconfigurer le "seed" ici puisque la cellule plus haut a déjà été exécuté.
+
+```{r}
+prop <- 0.8
+n_a <- round(prop * nrow(Smarket))
+id_a <- sample(nrow(Smarket), size = n_a, replace = FALSE)
+Smarket_a <- Smarket[id_a, ] # échantillon d'entraînement
+Smarket_t <- Smarket[-id_a, ] # échantillon de test
+```
+
+Réaliser un modèle GLM de type régression logistique pour prédire la variable "Direction" en fonction des variables "Lag1", "Lag", "Lag3", "Lag4", "Lag5" et "Volume".
+
+```{r}
+fit_glm <- glm(...)
+summary(fit_glm)
+```
+
+Ici, on peut calculer l'EQM sur les données d'entraînement, qui se nomme "Brier score" dans le cas d'une tâche de classification. Il faut simplement convertir la variable factorielle "Direction" en variable numérique 0/1.
+
+```{r}
+# as.numeric transforme les niveaux factoriels "0" et "1" en 1 et 2 par défaut,
+# donc on soustrait 1 pour obtenir 0 et 1.
+numeric_var <- as.numeric(Smarket_a$Direction) - 1
+cat("Brier score pour les données d'entraînement:", 
+    round(..., 2), "\n")
+```
+
+On peut désormais prédire la régression logistique sur les données de test en utilisant la fonction "predict" et afficher les 5 premières valeurs.
+
+```{r}
+preds_glm <- predict(fit_glm, newdata = Smarket_t)
+preds_glm[1:5]
+```
+
+Attention, ces valeurs ne correspondent pas aux scores prédits puisqu'elles ne sont pas dans l'intervalle [0,1]. Il s'agit des valeurs obtenues avant application de la fonction logistique.
+
+```{r}
+1 / (1 + exp(-preds_glm[1:5]))
+```
+
+On peut également obtenir ces valeurs en ajoutant une option dans la fonction "predict":
+
+```{r}
+scores <- predict(fit_glm, newdata = Smarket_t, type = 'response')
+scores[1:5]
+```
+
+Pour transformer ces scores en classes "Up" (1) /"Down" (0), on peut assigner la valeur "Up"/1 aux scores supérieurs à 0.5 et "Down"/0 sinon.
+
+```{r}
+preds_glm <- ifelse(scores > 0.5, "Up", "Down")
+preds_glm[1:5]
+```
+
+On peut calculer l'erreur de prédiction sur les données de test en comptant le nombre de fois où le modèle se trompe:
+
+```{r}
+err_down <- sum(preds_glm == "Up" & Smarket_t$Direction == "Down")
+cat("Nombre de fois où le modèle prédit 'Up' alors que la classe réelle est 'Down':", 
+    err_down, "\n")
+
+err_up <- sum(...)
+cat("Nombre de fois où le modèle prédit 'Down' alors que la classe réelle est 'Up':", 
+    err_up, "\n")
+
+err_total <- ...
+cat("Nombre total d'erreurs de prédiction sur l'échantillon de test:", 
+    err_total, "\n")
+
+err_taux <- (err_total/nrow(Smarket_t))*100
+cat("Taux d'erreur de prédiction sur l'échantillon de test:", 
+    round(err_taux, 2), "%", "\n")
+```
+
+## Régression multinomiale
+
+On commence par télécharger les données iris disponibles ici: <https://archive.ics.uci.edu/dataset/53/iris>.
+
+On importe le jeu de données grâce à la fonction read_csv.
+
+```{r}
+?read.csv
+Iris <- read.csv(...)
+colnames(Iris) <- c('sepal.len','sepal.wid','petal.len','petal.wid','species')
+head(Iris)
+```
+
+Ici, on cherche à prédire la variable "species", qui correspond à une espèce d'iris. Les variables explicatives sont: "sepal.len" correspondant à la longueur du sépale de la fleur, "sepal.wid" à sa largeur, "petal.len" à la longueur du pétale et "petal.wid" à sa largeur.
+
+Quel est le type de la variable "species" ? Transformez le type de la variable en facteur si son type est différent de "factor":
+
+```{r}
+...
+```
+
+Quelles sont les différentes modalités de cette variable ? Et, selon R, quelle est la modalité de référence ? Réponse: setosa
+
+```{r}
+unique(...)
+```
+
+Comme dans la partie précédente, on commence par diviser le dataset en deux échantillons: entraînement (80%) et test (20%).
+
+```{r}
+prop <- 0.8
+n_a <- round(prop * nrow(Iris))
+id_a <- sample(nrow(Iris), size = n_a, replace = FALSE)
+Iris_a <- Iris[id_a, ] # échantillon d'entraînement
+Iris_t <- Iris[-id_a, ] # échantillon de test
+```
+
+Pour réaliser un modèle de régression multinomiale en R, on ne peut pas utiliser la fonction "glm" comme pour la régression logistique. On utilise la fonction "multinom" de la librairie "nnet".
+
+```{r}
+?multinom
+fit_multi <- multinom(...)
+summary(fit_multi)
+```
+
+On peut désormais prédire la régression multinomiale sur les données de test en utilisant la fonction "predict" et afficher les 5 premières valeurs.
+
+```{r}
+preds_multi <- predict(fit_multi, newdata = Iris_t)
+preds_multi[1:5]
+```
+
+Cette fois-ci, la fonction "predict" par défaut nous renvoie directement les classes prédites (après avoir sélectionné la classe obtenant le score prédit le plus élevé parmi les trois classes d'espèces).
+
+Pour récupérer les scores prédits pour chaque espèce et chaque observation de la base de test, on spécifie une option dans la fonction "predict".
+
+```{r}
+scores_multi <- predict(fit_multi, newdata = Iris_t, type = "probs")
+scores_multi[1:5, ]
+```
+
+On peut calculer l'erreur de prédiction sur les données de test en comptant le nombre de fois où le modèle se trompe:
+
+```{r}
+err_total <- sum(preds_multi != Iris_t$species)
+cat("Nombre total d'erreurs de prédiction sur l'échantillon de test:", 
+    err_total, "\n")
+
+err_taux <- (err_total/nrow(Iris_t))*100
+cat("Taux d'erreur de prédiction sur l'échantillon de test:", 
+    round(err_taux, 2), "%", "\n")
+```
