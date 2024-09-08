@@ -6,6 +6,8 @@ date: "2024"
 
 # Régression linéaire et Classification linéaire
 
+Dans ce notebook, les champs "..." sont à compléter.
+
 ## Options par défaut des blocs de code R
 
 Cette option spécifie que le code source R sera affiché dans le document généré.
@@ -44,21 +46,21 @@ library(ggplot2)
 
 ## Visualisation d'un jeu de données
 
-On commence par visualiser les premières lignes du jeu de données Boston, disponible dans la librairie "MASS". La variable sortie $Y$ correspond à "medv" (median house value in Boston for 506 census tracts in Boston). On essaiera de prédire $Y$ à l'aide de plusieurs variables explicatives: "rm" (average number of rooms per house), "age" (average age of houses), et "lstat" (percent of households with low socioeconomic status).
+On commence par visualiser les premières lignes du jeu de données "Boston", disponible dans la librairie "MASS". La variable sortie $Y$ correspond à "medv" (median house value in Boston for 506 census tracts in Boston). On essaiera de prédire $Y$ à l'aide de plusieurs variables explicatives: "rm" (average number of rooms per house), "age" (average age of houses), et "lstat" (percent of households with low socioeconomic status).
 
 ```{r}
 ?Boston
 head(Boston)
 ```
 
-Type d'objet sous R du jeu de données Boston:
+Type d'objet sous R du jeu de données "Boston":
 ```{r}
 class(Boston)
 ```
 
 Sur R, les matrices "matrix" ou dataframes "data.frame", sont des structures de données bidimensionnelles, c'est-à-dire comportant un nombre de lignes et un nombre de colonnes. Tous les éléments d'une matrice doivent être du même type de données (par exemple, tous numériques, tous caractères, etc.). Au contraire, un objet de type "data.frame" peut contenir des colonnes de types de données différents.
 
-Combien y a-t-il d'observations dans ce jeu de données, noté $n$ ? Et, combien de variables explicatives disposons-nous pour prédire $Y$ ?
+Combien y a-t-il d'observations dans ce jeu de données, noté $n$ ? Et, combien de variables explicatives disposons-nous pour prédire $Y$, noté $p$ ?
 ```{r}
 n <- ...
 p <- ...
@@ -80,7 +82,7 @@ Histogramme de la variable à prédire medv avec un nombre de "breaks" égal à 
 hist(Boston$medv, breaks = 20, main = "Histogramme de medv", xlab = "medv")
 ```
 
-A l'exception de medv, y a-t-il dans le jeu de données de Boston une variable quantitative ? Une variable qualitative ? Si oui, quel est son nombre de catégories ?
+A l'exception de "medv", y a-t-il dans le jeu de données "Boston" une variable quantitative ? Une variable qualitative ? Si oui, quel est son nombre de catégories ?
 
 ```{r}
 str(Boston) # me donne le type de chaque colonne
@@ -99,9 +101,9 @@ k2 <- length(unique(Boston$rad))
 cat("Nombre de catégories de la variable rad:", ..., "\n")
 ```
 
-## Régression linéaire sur medv
+## Régression linéaire sur "medv"
 
-Séparez aléatoirement le jeu de données Boston en un échantillon d'entraînement (80%) et un échantillon de test (20%) à l'aide de la fonction "sample". Pour cela dans un premier temps, on fixe le "seed" afin d'être en mesure de retrouver nos résultats si on relance le script R plusieurs fois.
+Séparez aléatoirement le jeu de données "Boston" en un échantillon d'entraînement (80%) et un échantillon de test (20%) à l'aide de la fonction "sample". Pour cela dans un premier temps, on fixe le "seed" afin d'être en mesure de retrouver nos résultats si on relance le script R plusieurs fois.
 
 ```{r}
 set.seed(2024)
@@ -139,7 +141,7 @@ calcul_EQM <- function(y, preds){
 
 Par la suite, on calculera l'EQM sur les données de test et d'entraînement pour chaque modèle de régression.
 
-### Régression linéaire simple avec lsat
+### Régression linéaire simple avec "lstat"
 
 Entraînez un modèle de régression linéaire simple sur les données d'entraînement en prenant comme seule variable explicative "lstat" (variable numérique). Affichez le résumé du modèle.
 
@@ -213,6 +215,7 @@ On commence par indiquer à R que la variable "chas" est catégorielle:
 
 ```{r}
 Boston$chas <- as.factor(Boston$chas)
+# On fait de même pour les échantillons d'entraînement et de test créés
 Boston_a$chas <- ...
 Boston_t$chas <- ...
 ```
@@ -230,7 +233,7 @@ fit_2 <- lm(...)
 summary(fit_2)
 ```
 
-Quelle est la modalité de référence de la variable chas dans ce modèle ? 
+Quelle est la modalité de référence de la variable "chas" dans ce modèle ? 
 
 La modalité 0 est la "baseline" pour la variable "chas" car il s'agit de la première valeur affichée comme "levels":
 
@@ -254,7 +257,9 @@ b0 <- ...
 b1 <- ...
 a1 <- ...
 # Le modèle dépend désormais de la modalité de la variable chas
-preds_2 <- b0 + b1 *Boston_t$lstat + a1 * as.numeric(Boston_t$chas == "1")
+preds_2 <- b0 + b1 * Boston_t$lstat + a1 * as.numeric(Boston_t$chas == "1")
+# L'expression "as.numeric(Boston_t$chas == "1")" nous donne la fonction indicatrice:
+# 1{chas = 1}
 preds_2[1:5]
 ```
 
@@ -265,7 +270,7 @@ preds_2 <- predict(...)
 preds_2[1:5]
 ```
 
-On peut désormais afficher le modèle linéaire appris (i.e. les deux droites obtenues) ainsi que les données de test ("medv" en fonction de "lstat"), en différenciant par couleur sur "chas".
+On peut désormais afficher le modèle linéaire appris (i.e. les deux droites obtenues) ainsi que les données de test ("medv" en fonction de "lstat"), en différenciant par couleur sur "chas". Cette fois-ci, on utilise la librairie "ggplot2" pour construire les graphes.
 
 ```{r}
 df <- data.frame(medv = Boston_t$medv, lsat = Boston_t$lstat, 
@@ -294,7 +299,8 @@ cat("EQM pour les données de test:",
 Entraînez un modèle de régression linéaire avec les variables "lstat" et "chas" sur les données d'entraînement, avec intéraction. Affichez le résumé du modèle.
 
 ```{r}
-fit_3 <- lm(...)
+# utilisez le signe "*" au lieu de "+" pour indiquer la prise en compte de l'intéraction à R
+fit_3 <- lm(...) 
 summary(fit_3)
 ```
 
@@ -356,6 +362,8 @@ L'hypothèse nulle est que les deux modèles (fit_2 et fit_3) s'ajustent aux don
 
 ### Régression linéaire multiple
 
+On commence par créer un modèle de régression linéaire à l'aide de toutes les variables présentes dans le jeu de données "Boston" (à l'exception de la variable à prédire "medv"). Le terme "~ ." nous évite d'avoir à renseigner toutes les variables explicatives du modèle linéaire et prend automatiquement l'ensemble des variables de "Boston" (sauf "medv").
+
 ```{r}
 fit_4 <- lm(medv ~ ., data = Boston_a)
 summary(fit_4)
@@ -390,6 +398,7 @@ Combien le modèle a-t-il appris de paramètres ?
 
 ```{r}
 ...
+
 ```
 
 Il pourrait être utile de faire de la sélection de variables ici.
@@ -477,7 +486,7 @@ Ici, on cherche à prédire la variable "Direction".
 Quel est le type de cette variable ?
 
 ```{r}
-...
+class(...)
 ```
 
 Quelles sont les différentes modalités de cette variable ? Et, selon R, quelle est la modalité de référence ?
@@ -551,7 +560,7 @@ err_up <- sum(...)
 cat("Nombre de fois où le modèle prédit 'Down' alors que la classe réelle est 'Up':", 
     err_up, "\n")
 
-err_total <- ...
+err_total <- err_down + err_up
 cat("Nombre total d'erreurs de prédiction sur l'échantillon de test:", 
     err_total, "\n")
 
@@ -562,7 +571,8 @@ cat("Taux d'erreur de prédiction sur l'échantillon de test:",
 
 ## Régression multinomiale
 
-On commence par télécharger les données iris disponibles ici: <https://archive.ics.uci.edu/dataset/53/iris>.
+On commence par télécharger les données iris disponibles ici: <https://archive.ics.uci.edu/dataset/53/iris>. 
+(sinon, vous pouvez les télécharger sur le github du cours: <https://github.com/freakonometrics/STT3030.git>)
 
 On importe le jeu de données grâce à la fonction read_csv.
 
@@ -579,9 +589,10 @@ Quel est le type de la variable "species" ? Transformez le type de la variable e
 
 ```{r}
 ...
+
 ```
 
-Quelles sont les différentes modalités de cette variable ? Et, selon R, quelle est la modalité de référence ? Réponse: setosa
+Quelles sont les différentes modalités de cette variable ? Et, selon R, quelle est la modalité de référence ?
 
 ```{r}
 unique(...)
