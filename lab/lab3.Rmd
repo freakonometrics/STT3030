@@ -1,0 +1,326 @@
+---
+title: "STT3030 Lab 3"
+output: pdf_document
+date: "2024"
+---
+
+# Régularisation: Lasso et Ridge
+
+## Options par défaut des blocs de code R
+
+Cette option spécifie que le code source R sera affiché dans le document généré.
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Répertoire de travail
+
+```{r}
+getwd()
+# A modifier:
+#setwd("/Users/agathefernandesmachado/stt3030/lab2")
+```
+
+## Installation des packages
+
+Une fois installés dans votre environnement, vous n'avez plus besoin d'utiliser ces commandes.
+
+```{r}
+#install.packages("ISLR")
+#install.packages("nnet")
+#install.packages("glmnet")
+```
+
+## Chargement des packages
+
+```{r}
+library(ISLR)
+library(nnet)
+library(glmnet)
+```
+
+## Visualisation du jeu de données
+
+```{r}
+head(Hitters)
+?Hitters
+```
+
+Quels sont le nombre de lignes et le nombre de colonnes du jeu de données?
+```{r}
+dim(...)
+```
+
+Y a-t-il des données manquantes? Si oui, combien?
+```{r}
+cat("Nombre de lignes comportant des données manquantes:", sum(is.na(Hitters)), "\n")
+cat("Indice des lignes avec des données manquantes:", which(is.na(Hitters)), "\n")
+```
+
+Voici comment supprimer l'ensemble des lignes comportant des données manquantes dans un jeu de données:
+```{r}
+Hitters <- na.omit(Hitters)
+```
+
+Voici les nouvelles dimensions du jeu de données:
+```{r}
+dim(Hitters)
+sum(is.na(Hitters)) # on s'assure qu'on a bel et bien retirer les lignes avec valeurs manquantes
+```
+On a donc supprimé:
+```{r}
+cat(round((322-263)/322*100, 2), "% de lignes", "\n")
+```
+
+On aurait pu remplacer ces données manquantes par des 0 ou la moyenne de la colonne dans le cas d'une variable quantitative, ou également par la médiane de la colonne dans le cas d'une variable qualitative.
+
+Nom des colonnes du jeu de données:
+```{r}
+colnames(...)
+```
+
+Histogramme de la variable à prédire "Salary":
+```{r}
+hist(..., xlab = "Salary", main = "Histogram of Salary", breaks = 20)
+```
+
+## Régression Ridge
+
+Nous allons utiliser la fonction "glmnet" (de la librairie R "glmnet"), qui permet de faire de la régression Ridge et Lasso, ainsi qu'un compromis entre ces deux méthodes de régularisation:
+```{r}
+?glmnet
+```
+
+La librairie "glmnet" prend comme argument les variables explicatives sous forme de matrice ("matrix" sous R), contrairement aux fonctions "lm" ou "glm" qui peuvent prendre un objet de type "data.frame" comme entrée.
+
+Le paramètre "alpha" permet de déterminer le type de régularisation qu'on souhaite utiliser: Ridge ("alpha=0"), Lasso ("alpha=1") ou un compromis entre les deux (https://academic.oup.com/jrsssb/article/67/2/301/7109482).
+
+La variable à prédire $y$ peut être sous forme qualitative ou quantitative, la fonction "glmnet" s'applique en effet aux algorithmes de type Generalized Linear Models (glm).
+
+Il est à noter que la matrice des variables explicatives $x$, en entrée de la fonction "glmnet", ne peut contenir que des données numériques.
+
+Quelle est le numéro de colonne de la variable à prédire ("Salary")?
+```{r}
+i_Y <- which(colnames(Hitters)=="Salary")
+i_Y
+```
+
+Ainsi, on définit la matrice des variables explicatives du jeu de données "Hitters":
+```{r}
+x <- as.matrix(Hitters[,-19])
+x[1:3,]
+```
+On remarque plusieurs "" indiquant que les valeurs du jeu de données "Hitters" sont toutes considérées comme étant des chaînes de caractères. On remarqu'il y a à la fois des variables qualitatives ("NewLeague" par exemple) et des variables quantitatives ("Hits" par exemple) dans le jeu de données. Or, la librairie "glmnet" ne prend en entrée que des variables explicatives dont les valeurs sont des données numériques. Il va donc falloir encoder nous-mêmes les chaînes de caractères comme des variables de type numérique, à l'aide de la méthode one-hot encoding (contrairement aux fonctions "lm" et "glm" de R qui gèrent les variables catégorielles/qualitatives en les transformant en variables numériques à l'aide de dummy variables et d'une modalité de référence pour éviter la colinéarité).
+
+Voici une fonction permettant de transformer une matrice comportant des variables quantitatives et qualitatives (toutes sous forme de chaînes de caractères) en données numériques: R opère la technique du one-hot encoding sur les variables quantitatives (R repère lui-même ce type de variables pour les transformer):
+```{r}
+x <- model.matrix(Salary~., Hitters)[, -1]
+x[1:3,]
+```
+R, comme dans les fonctions "lm" et "glm", définit une modalité de référence pour les variables catégorielles "League", "Division" et "NewLeague".
+
+On transforme également les observations de la variable à prédire "Salary" en vecteur:
+```{r}
+y <- Hitters$Salary
+```
+
+On peut désormais appliquer la fonction "glmnet" afin d'entraîner un modèle de régression Ridge pour différentes valeurs de $\lambda$:
+```{r}
+ridgefit <- glmnet(x, y, alpha = 0)
+```
+
+On peut représenter les différents coefficients du modèle en fonction de la valeur de $\lambda$ (poids de la pénalité Ridge dans la régression linéaire), en échelle logarithmique:
+```{r}
+plot(ridgefit, xvar = "lambda")
+```
+
+```{r}
+dim(coef(ridgefit))
+```
+On obtient 20 coefficients (l'intercept ou $\beta_0$ et les $\boldsymbol{\beta}$ associés aux variables explicatives du jeu de données "Hitters") estimés pour 100 valeurs différentes de $\lambda$.
+
+On peut également obtenir les coefficients estimés à l'aide de la fonction "predict" où "s" indique la valeur du paramètre de pénalité $\lambda$:
+```{r}
+?predict.glmnet
+predict(ridgefit , s = 50, type = "coefficients")[1:20,]
+```
+Maintenant qu'on a compris comment la fonction "glmnet" fonctionne, on va entraîner un modèle de régression Ridge sur le jeu de données "Hitters". On commence donc par séparer la base de données en un échantillon d'entraînement (pour estimer les coefficients du modèle) et un échantillon de test (pour évaluer le modèle obtenu sur de nouvelles données).
+
+```{r}
+set.seed(2024)
+n <- nrow(x) # Nombre d'observations dans le jeu de données "Hitters"
+prop <- 0.8 # Proportion du jeu de données qu'on désire avoir dans l'échantillon d'entraînement (80%)
+ntrain <- floor(nrow(x)*prop) # Nombre d'observations souhaité dans l'échantillon d'entraînement (80% * n)
+ntest <- n - ntrain # Nombre d'observations dans l'échantillon de test (20% * n)
+
+# On mélange les numéros de ligne du jeu de données et on conserve les ntrain premières 
+train_id <- sample(1:nrow(x), size = ntrain, replace = FALSE)
+test <- (-train_id)
+```
+
+On mélange les numéros de lignes avant de retenir les ntrain premières observations dans l'échantillon d'entraînement car le jeu de données a pu être ordonné au préalable (selon la variable à prédire "Salary" ou selon tout autre variable).
+
+On retient les observations associées aux numéros de lignes correspondant à ceux tirés pour l'échantillon d'entraînement ("train_id") puis on transforme l'échantillon d'entraînement en objet "matrix" pour pouvoir utiliser la fonction "glmnet".
+```{r}
+Hitters_train <- Hitters[train_id, ]
+x_train <- model.matrix(Salary~., Hitters_train)[,-1]
+y_train <- Hitters_train$Salary
+dim(x_train) # Dimension de la matrice obtenue
+```
+On fait de même pour l'échantillon de test:
+```{r}
+Hitters_test <- Hitters[(ntrain+1):n,]
+x_test <- model.matrix(Salary~., Hitters_test)[,-1]
+y_test <- Hitters_test$Salary
+dim(x_test)
+```
+À partir de maintenant, on met l'échantillon de test de côté, qui ne doit servir que pour l'évaluation du modèle pour ne pas "tricher", et on travaille sur l'échantillon d'entraînement.
+
+On va optimiser la valeur de $\lambda$ en utilisant la validation croisée. Cela permet de ne pas réserver un échantillon de validation séparé (et donc de perdre des données pour l'entraînement du modèle). Dans le cadre du réglage des hyperparamètres, la validation croisée est employée pour évaluer et sélectionner les meilleures valeurs pour un modèle. Elle implique de diviser les données en $k$ sous-ensembles (ou "folds"). Pour chaque valeur d'hyperparamètre $\lambda$, le modèle est entraîné sur une partie des sous-ensembles (généralement sur $k-1$ "folds") et testé sur le sous-ensemble restant. Ensuite, la performance du modèle pour chaque valeur d'hyperparamètre est évaluée sur le sous-ensemble restant. Ce processus est répété $k$ fois, de sorte que chaque "fold" serve à évaluer la performance à un moment donné (comme un échantillon de test). A la fin, les $k$ performances obtenues sont moyennées pour donner une estimation fiable de la performance du modèle pour chaque valeur d'hyperparamètre. La valeur de l'hyperparamètre qui fournit la meilleure performance moyenne est alors choisie. Cette méthode aide à éviter le surapprentissage sur un seul ensemble de données et optimise donc les hyperparamètres de manière plus fiable que si on avait utilisé l'ensemble d'entraînement.
+
+Domaine pour la recherche d'un lambda optimal:
+```{r}
+tabl <- exp(seq(-8, 14, by = .01))
+```
+
+Régression Ridge avec validation croisée:
+```{r}
+cvfit <- cv.glmnet(x_train, y_train, alpha = 0, lambda = tabl)
+# k = nfolds ici (10 par défaut)
+```
+
+On peut représenter le graphique donnant la moyenne de l'EQM (sur les $k$ folds) pour les différentes valeurs de $\lambda$ (contenues dans l'objet "tabl"):
+```{r}
+plot(cvfit)
+```
+La première ligne en pointillés correspond à la valeur de $\lambda$ donnant l'EQM minimale:
+```{r}
+cvfit$lambda.min # lambda optimal
+coef(cvfit, s = "lambda.min")[1:20,] # paramètres optimaux
+cvfit$cvm[cvfit$lambda==cvfit$lambda.min] # EQM avec paramètres optimaux
+```
+La deuxième ligne en pointillés correspond à la valeur de $\lambda$ correspond à la plus grande valeur de $\lambda$ pour laquelle l'erreur de validation croisée (EQM) est dans une plage d'une erreur standard autour du minimum d'EQM:
+```{r}
+cvfit$lambda.1se
+coef(cvfit, s = "lambda.1se")[1:20,] # paramètres associés à lambda.1se
+cvfit$cvm[cvfit$lambda==cvfit$lambda.1se] # EQM associé à lambda.1se
+```
+L'idée derrière "lambda.1se" est de sélectionner un modèle plus simple, car avec plus de régularisation ($lambda.1se > lambda.min$) conservant une EQM proche de l'EQM minimale.
+
+On connaît désormais la valeur de l'hyperparamètre $\lambda$ optimale grâce au mécanisme de validation croisée. Observons l'impact sur les coefficients estimés:
+```{r}
+fit <- glmnet(x_train, y_train, alpha = 0, lambda = tabl)
+plot(fit, xvar="lambda")
+abline(v = log(cvfit$lambda.min)) 
+abline(v = log(cvfit$lambda.1se))
+
+# On peut ajouter le numéro des coefficients (associé à un numéro de colonnes de x_train) pour chaque courbe
+vnat <- coef(fit)
+vnat <- vnat[-1, ncol(vnat)]
+axis(2, at = vnat, line = -2, label = as.character(1:19), las = 1, tick = FALSE, cex.axis = 1)
+```
+On peut prédire le modèle régularisé avec "lambda.min" sur nos données de test.
+```{r}
+pred <- predict(cvfit, s = cvfit$lambda.min, newx = x_test)
+pred[1:5, ]
+```
+On définit une fonction calculant l'EQM afin d'évaluer la performance du modèle. Une bonne pratique de travail est d'ajouter quelques commentaires pour décrire la fonction.
+
+```{r}
+# calcul_eqm: retourne l'EQM entre deux vecteurs.
+# pred: vecteurs de prédictions
+# y: vecteur de vraies valeurs
+calcul_EQM <- function(y, preds){
+  eqm <- sum((preds - y)^2)/length(y)
+  eqm
+}
+```
+
+On peut calculer l'EQM obtenu sur les données de test avec la régression Ridge:
+```{r}
+ridge_EQM <- calcul_EQM(y_test, pred)
+ridge_EQM
+```
+
+## Régression Lasso
+
+La procédure est exactement la même que pour la régression Ridge sauf qu'on spécifie "alpha = 1" dans la fonction "glmnet".
+
+On garde le même domaine pour la recherche d'un lambda optimal que pour la régression Ridge:
+```{r}
+tabl <- ...
+```
+
+Régression Ridge avec validation croisée:
+```{r}
+cvfit <- cv.glmnet(...)
+# k = nfolds ici (10 par défaut)
+```
+
+On peut représenter le graphique donnant la moyenne de l'EQM (sur les $k$ folds) pour les différentes valeurs de $\lambda$ (contenues dans l'objet "tabl"):
+```{r}
+plot(cvfit)
+```
+La première ligne en pointillés correspond à la valeur de $\lambda$ donnant l'EQM minimale. Afficher la valeur du $\lambda$ correspondant, les coefficients ainsi que l'EQM minimale:
+```{r}
+lambda <- ...
+cat("Lambda:", lambda, "\n")
+coef <- ...
+cat("Coefficients associés à lambda:", coef, "\n")
+eqm <- ...
+cat("EQM associée à lambda:", eqm, "\n")
+```
+Faire de même pour la deuxième ligne en pointillés, correspondant à la plus grande valeur de $\lambda$ pour laquelle l'erreur de validation croisée (EQM) est dans une plage d'une erreur standard autour du minimum d'EQM:
+```{r}
+lambda <- ...
+cat("Lambda:", lambda, "\n")
+coef <- ...
+cat("Coefficients associés à lambda:", coef, "\n")
+eqm <- ...
+cat("EQM associée à lambda:", eqm, "\n")
+```
+Contrairement à la régression Ridge, on voit clairement le mécanisme de sélection de variables pour Lasso car certains coefficients ont des valeurs égales à 0.
+
+On choisit désormais la valeur de l'hyperparamètre $\lambda$ optimale ("lambda.min"). Observons l'impact sur les coefficients estimés:
+```{r}
+fit <- glmnet(x_train, y_train, alpha = 1, lambda = tabl)
+plot(fit, xvar="lambda")
+abline(v = log(cvfit$lambda.min)) 
+abline(v = log(cvfit$lambda.1se))
+
+# On peut ajouter le numéro des coefficients (associé à un numéro de colonnes de x_train) pour chaque courbe
+vnat <- coef(fit)
+vnat <- vnat[-1, ncol(vnat)]
+axis(2, at = vnat, line = -2, label = as.character(1:19), las = 1, tick = FALSE, cex.axis = 1)
+```
+
+Prédire le modèle régularisé avec Lasso "lambda.min" sur nos données de test et afficher les cinq premières valeurs:
+```{r}
+pred <- predict(...)
+pred[..., ]
+```
+
+Calculer l'EQM obtenu sur les données de test avec la régression Lasso, et comparer la valeur avec celle obtenue avec la régression Ridge:
+```{r}
+lasso_EQM <- calcul_EQM(...)
+lasso_EQM
+ridge_EQM
+```
+
+## Régression linéaire simple
+
+On peut comparer les résultats de régressions Lasso et Ridge avec la régression linéaire simple:
+```{r}
+lmfit <- lm(Salary~., data = Hitters_train)
+pred <- predict(lmfit, newdata = Hitters_test)
+lm_EQM <- calcul_EQM(y_test, pred)
+lm_EQM
+lasso_EQM
+ridge_EQM
+```
+
+
+
+
+
