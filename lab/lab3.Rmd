@@ -55,7 +55,7 @@ dim(...)
 Y a-t-il des données manquantes? Si oui, combien?
 ```{r}
 cat("Nombre de lignes comportant des données manquantes:", sum(is.na(Hitters)), "\n")
-cat("Indice des lignes avec des données manquantes:", which(is.na(Hitters)), "\n")
+cat("Indice des lignes avec des données manquantes:", which(is.na(Hitters))[1:5], "\n")
 ```
 
 Voici comment supprimer l'ensemble des lignes comportant des données manquantes dans un jeu de données:
@@ -96,7 +96,7 @@ La librairie "glmnet" prend comme argument les variables explicatives sous forme
 
 Le paramètre "alpha" permet de déterminer le type de régularisation qu'on souhaite utiliser: Ridge ("alpha=0"), Lasso ("alpha=1") ou un compromis entre les deux (https://academic.oup.com/jrsssb/article/67/2/301/7109482).
 
-La variable à prédire $y$ peut être sous forme qualitative ou quantitative, la fonction "glmnet" s'applique en effet aux algorithmes de type Generalized Linear Models (glm).
+La variable à prédire $y$ peut être sous forme qualitative ou quantitative, la fonction "glmnet" s'applique en effet aux algorithmes de type Generalized Linear Models (GLM).
 
 Il est à noter que la matrice des variables explicatives $x$, en entrée de la fonction "glmnet", ne peut contenir que des données numériques.
 
@@ -113,7 +113,7 @@ x[1:3,]
 ```
 On remarque plusieurs "" indiquant que les valeurs du jeu de données "Hitters" sont toutes considérées comme étant des chaînes de caractères. On remarqu'il y a à la fois des variables qualitatives ("NewLeague" par exemple) et des variables quantitatives ("Hits" par exemple) dans le jeu de données. Or, la librairie "glmnet" ne prend en entrée que des variables explicatives dont les valeurs sont des données numériques. Il va donc falloir encoder nous-mêmes les chaînes de caractères comme des variables de type numérique, à l'aide de la méthode one-hot encoding (contrairement aux fonctions "lm" et "glm" de R qui gèrent les variables catégorielles/qualitatives en les transformant en variables numériques à l'aide de dummy variables et d'une modalité de référence pour éviter la colinéarité).
 
-Voici une fonction permettant de transformer une matrice comportant des variables quantitatives et qualitatives (toutes sous forme de chaînes de caractères) en données numériques: R opère la technique du one-hot encoding sur les variables quantitatives (R repère lui-même ce type de variables pour les transformer):
+Voici une fonction permettant de transformer une matrice comportant des variables quantitatives et qualitatives (toutes sous forme de chaînes de caractères) en données numériques: R opère la technique du one-hot encoding sur les variables qualitatives (R repère lui-même ce type de variables pour les transformer):
 ```{r}
 x <- model.matrix(Salary~., Hitters)[, -1]
 x[1:3,]
@@ -150,11 +150,18 @@ Maintenant qu'on a compris comment la fonction "glmnet" fonctionne, on va entra�
 ```{r}
 set.seed(2024)
 n <- nrow(x) # Nombre d'observations dans le jeu de données "Hitters"
-prop <- 0.8 # Proportion du jeu de données qu'on désire avoir dans l'échantillon d'entraînement (80%)
-ntrain <- floor(nrow(x)*prop) # Nombre d'observations souhaité dans l'échantillon d'entraînement (80% * n)
-ntest <- n - ntrain # Nombre d'observations dans l'échantillon de test (20% * n)
+# Proportion du jeu de données qu'on désire 
+# avoir dans l'échantillon d'entraînement (80%):
+prop <- 0.8
+# Nombre d'observations souhaité dans 
+# l'échantillon d'entraînement (80% * n):
+ntrain <- floor(nrow(x)*prop) 
+# Nombre d'observations dans 
+# l'échantillon de test (20% * n):
+ntest <- n - ntrain 
 
-# On mélange les numéros de ligne du jeu de données et on conserve les ntrain premières 
+# On mélange les numéros de ligne du jeu de données et 
+# on conserve les ntrain premières:
 train_id <- sample(1:nrow(x), size = ntrain, replace = FALSE)
 test <- (-train_id)
 ```
@@ -194,6 +201,7 @@ On peut représenter le graphique donnant la moyenne de l'EQM (sur les $k$ folds
 ```{r}
 plot(cvfit)
 ```
+
 La première ligne en pointillés correspond à la valeur de $\lambda$ donnant l'EQM minimale:
 ```{r}
 cvfit$lambda.min # lambda optimal
@@ -215,16 +223,20 @@ plot(fit, xvar="lambda")
 abline(v = log(cvfit$lambda.min)) 
 abline(v = log(cvfit$lambda.1se))
 
-# On peut ajouter le numéro des coefficients (associé à un numéro de colonnes de x_train) pour chaque courbe
+# On peut ajouter le numéro des coefficients 
+# (associé à un numéro de colonnes de x_train) 
+# pour chaque courbe:
 vnat <- coef(fit)
 vnat <- vnat[-1, ncol(vnat)]
 axis(2, at = vnat, line = -2, label = as.character(1:19), las = 1, tick = FALSE, cex.axis = 1)
 ```
+
 On peut prédire le modèle régularisé avec "lambda.min" sur nos données de test.
 ```{r}
 pred <- predict(cvfit, s = cvfit$lambda.min, newx = x_test)
 pred[1:5, ]
 ```
+
 On définit une fonction calculant l'EQM afin d'évaluer la performance du modèle. Une bonne pratique de travail est d'ajouter quelques commentaires pour décrire la fonction.
 
 ```{r}
@@ -262,21 +274,25 @@ On peut représenter le graphique donnant la moyenne de l'EQM (sur les $k$ folds
 ```{r}
 plot(cvfit)
 ```
+
 La première ligne en pointillés correspond à la valeur de $\lambda$ donnant l'EQM minimale. Afficher la valeur du $\lambda$ correspondant, les coefficients ainsi que l'EQM minimale:
 ```{r}
 lambda <- ...
 cat("Lambda:", lambda, "\n")
 coef <- ...
-cat("Coefficients associés à lambda:", coef, "\n")
+cat("Coefficients associés à lambda:", coef[1:10], "\n")
+cat(coef[11:20], "\n")
 eqm <- ...
 cat("EQM associée à lambda:", eqm, "\n")
 ```
+
 Faire de même pour la deuxième ligne en pointillés, correspondant à la plus grande valeur de $\lambda$ pour laquelle l'erreur de validation croisée (EQM) est dans une plage d'une erreur standard autour du minimum d'EQM:
 ```{r}
 lambda <- ...
 cat("Lambda:", lambda, "\n")
 coef <- ...
-cat("Coefficients associés à lambda:", coef, "\n")
+cat("Coefficients associés à lambda:", coef[1:10], "\n")
+cat(coef[11:20], "\n")
 eqm <- ...
 cat("EQM associée à lambda:", eqm, "\n")
 ```
@@ -289,7 +305,9 @@ plot(fit, xvar="lambda")
 abline(v = log(cvfit$lambda.min)) 
 abline(v = log(cvfit$lambda.1se))
 
-# On peut ajouter le numéro des coefficients (associé à un numéro de colonnes de x_train) pour chaque courbe
+# On peut ajouter le numéro des coefficients 
+# (associé à un numéro de colonnes de x_train) 
+# pour chaque courbe:
 vnat <- coef(fit)
 vnat <- vnat[-1, ncol(vnat)]
 axis(2, at = vnat, line = -2, label = as.character(1:19), las = 1, tick = FALSE, cex.axis = 1)
