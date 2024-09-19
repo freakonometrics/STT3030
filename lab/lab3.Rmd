@@ -208,7 +208,7 @@ cvfit$lambda.min # lambda optimal
 coef(cvfit, s = "lambda.min")[1:20,] # paramètres optimaux
 cvfit$cvm[cvfit$lambda==cvfit$lambda.min] # EQM avec paramètres optimaux
 ```
-La deuxième ligne en pointillés correspond à la valeur de $\lambda$ correspond à la plus grande valeur de $\lambda$ pour laquelle l'erreur de validation croisée (EQM) est dans une plage d'une erreur standard autour du minimum d'EQM:
+La deuxième ligne en pointillés correspond à la plus grande valeur de $\lambda$ pour laquelle l'erreur de validation croisée (EQM) est dans une plage d'une erreur standard autour du minimum d'EQM:
 ```{r}
 cvfit$lambda.1se
 coef(cvfit, s = "lambda.1se")[1:20,] # paramètres associés à lambda.1se
