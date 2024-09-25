@@ -25,10 +25,11 @@ selon [UQAM](https://etudier.uqam.ca/cours?sigle=STT3030), les préalables sont 
 * Lab1: [STT3030-Lab1.pdf](/lab/STT3030-Lab1.pdf), [lab1.R](/lab/lab1.R), [lab1.rmd](/lab/lab1.rmd), [lab1.md](/lab/lab1.md),
 * Lab2: [STT3030-Lab2.pdf](/lab/lab2_correction.pdf), [lab2.rmd](/lab/lab2.Rmd), [lab2_correction.R](/lab/lab2_correction.R), [lab2_correction.rmd](/lab/lab2_correction.rmd), [Données Iris](/lab/iris.zip),
 * Lab3: [STT3030-Lab3.pdf](/lab/lab3_correction.pdf), [lab3.rmd](/lab/lab3.Rmd), [lab3_correction.R](/lab/lab3_correction.R), [lab3_correction.rmd](/lab/lab3_correction.Rmd),
-* Lab4: [STT3030-Lab4.pdf](/lab/STT3030-Lab4.pdf), [lab4.R](/lab/lab4.R), [lab4.rmd](/lab/lab4.rmd), [lab4.md](/lab/lab4.md), 
+* Lab4: [lab4.R](/lab/lab4.R)
 
 **Cours**
 Les notes de cours sont très librement inspirées des notes de cours de Cédric Beaulac,
 * Cours1: [cours1.pdf](/docs/STT3030-1.pdf),
 * Cours2: [cours2.pdf](/docs/STT3030-2.pdf),
 * Cours3: [cours3.pdf](/docs/STT3030-3.pdf),
+* Cours4: [cours4.pdf](/docs/STT3030-4.pdf),
