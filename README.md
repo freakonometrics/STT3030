@@ -2,7 +2,7 @@
 
 Arthur Charpentier, professeur
 
-Plan de cours : [Plan_Cours_STT3030_A2024.pdf](/docs/Plan_Cours_STT3030_A2024.pdf) (version non approuvée)
+Plan de cours : [Plan_Cours_STT3030_A2024.pdf](/docs/Plan_Cours_STT3030_A2024.pdf) (version approuvée)
 
 ```diff
 - Les codes pour récupérer les données pour le devoir sont en ligne
