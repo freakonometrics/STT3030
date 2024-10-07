@@ -33,4 +33,4 @@ Les notes de cours sont très librement inspirées des notes de cours de Cédric
 * Cours2: [cours2.pdf](/docs/STT3030-2.pdf),
 * Cours3: [cours3.pdf](/docs/STT3030-3.pdf),
 * Cours4: [cours4.pdf](/docs/STT3030-4.pdf),
-* Cours5: [cours4.pdf](/docs/STT3030-5.pdf),
+* Cours5: [cours5.pdf](/docs/STT3030-5.pdf),
