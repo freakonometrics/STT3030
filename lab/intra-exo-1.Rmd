@@ -1,0 +1,176 @@
+---
+title: "intra-exo1 STT3030-ACT6010 A2024"
+author: ABCD12345678
+output: html_document
+---
+
+--- *Ne pas changer le préambule suivant*
+
+```{r setup, include=FALSE}
+library(ISLR2)
+library(glmnet)
+REMPLIR <- 0 # instruction inutile permettant juste de compiler le .Rmd
+```
+
+# Exercice pratique
+
+```{r}
+library(ISLR2)
+library(glmnet)
+data(Boston)
+```
+
+## 1 Bases entrainement et test
+
+--- *Ne pas changer le code suivant*
+
+### méthode 1
+
+```{r}
+set.seed(123)
+train <- sample(nrow(Boston), nrow(Boston) * 2/3)
+test  <- sample(nrow(Boston), nrow(Boston) * 1/3)
+Boston_train_1 <- Boston[train,]
+Boston_test_1  <- Boston[test,]
+```
+
+### méthode 2
+
+```{r}
+set.seed(123)
+Boston <- Boston[order(Boston$crim),]
+train <- sample(1:(round(nrow(Boston) * 2/3)))
+Boston_train_2 <- Boston[train,]
+Boston_test_2  <- Boston[-train,]
+```
+
+### méthode 3
+
+```{r}
+set.seed(123)
+train <- sample(nrow(Boston), nrow(Boston) * 2/3)
+Boston_train_3 <- Boston[train,]
+Boston_test_3 <- Boston[-train,]
+```
+
+### Réponse
+
+--- *À compléter*
+
+La méthode 1 ... 
+
+La méthode 2 ...
+
+La méthode 3 ...
+
+### Données
+
+--- *Modifier le code suivant pour choisir la bonne méthode, en changeant* `_x` *en* `_1`, `_2` *ou* `_3`
+
+```{r}
+Boston_train <- Boston_train_x
+Boston_test  <- Boston_test_x
+```
+
+## 2 Plus proches voisins 
+
+--- *Ne pas changer le code suivant*
+
+```{r}
+indiv <- Boston_test[1,]
+x <- as.numeric(indiv["age"])
+```
+
+Le *premier* individu dans la base de test `Boston_test` est d'âge `r round(x,2)`.
+
+--- *À compléter*
+
+```{r}
+nb_voisins <- 10
+```
+
+La moyenne de `log(crim)` des 10 personnes dans la base `Boston_train` dont l'âge est le plus proche de `r round(x,2)` est *À compléter*
+
+## 3 Modèle linéaire 
+
+--- *À compléter*
+
+```{r}
+model_lm <- lm(log(crim) ~ .)
+```
+
+```{r}
+MSE_test_lm <- REMPLIR
+```
+
+## 4 Modèles linéaires Ridge et Lasso
+
+--- *Ne pas modifier*
+
+```{r}
+Boston_X_train <- model.matrix(log(crim) ~ ., data = Boston_train)
+Boston_X_test  <- model.matrix(log(crim) ~ ., data = Boston_test)
+Boston_y <- Boston_train$crim
+```
+
+### Modèles linéaires Ridge
+
+--- *À compléter*
+
+```{r}
+model_ridge <- REMPLIR
+MSE_test_ridge <- REMPLIR
+```
+
+```{r}
+model_ridge_star <- REMPLIR
+```
+
+```{r}
+model_lasso <- REMPLIR
+MSE_test_lasso <- REMPLIR
+```
+
+```{r}
+model_lasso_star <- REMPLIR
+```
+
+## 5 Modèle linéaire Lasso et sélection de variable
+
+```{r}
+model_lm_1 <- lm(log(crim) ~ REMPLIR)
+MSE_test_lm_1 <- REMPLIR
+```
+
+```{r}
+model_lm_2 <- lm(log(crim) ~ REMPLIR)
+MSE_test_lm_2 <- REMPLIR
+```
+
+## 6 Modèle logistique
+
+--- *Ne pas changer le code suivant*
+
+```{r}
+seuil <- 0.25
+Boston_prop <- (Boston_y > seuil)*1
+Boston_train$crim <- (Boston_train$crim > seuil)*1
+```
+
+--- *À modifier*
+
+```{r}
+model_logistique <- glm(REMPLIR,
+                        family = "binomial")
+```
+
+## 7 Modèle logistique régularisé
+
+```{r}
+seuil <- 0.25
+Boston_prop <- (Boston_y > seuil)*1
+```
+
+```{r}
+model_lasso_proportion <- REMPLIR
+```
