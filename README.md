@@ -27,7 +27,7 @@ selon [UQAM](https://etudier.uqam.ca/cours?sigle=STT3030), les préalables sont 
 * Lab3: [STT3030-Lab3.pdf](/lab/lab3_correction.pdf), [lab3.rmd](/lab/lab3.Rmd), [lab3_correction.R](/lab/lab3_correction.R), [lab3_correction.rmd](/lab/lab3_correction.Rmd),
 * Lab4: [lab4.R](/lab/lab4.R)
 * Lab5: [lab5.R](/lab/lab5.R), [energy.xlsx](/data/energy.xlsx)
-* Lab6: [intra.Rmd](/lab/intra-exo-1.Rmd),
+* Lab6: [intra.Rmd](/lab/intra-exo-1.Rmd), [lab6.R](/lab/lab6.R),
 
 **Cours**
 Les notes de cours sont très librement inspirées des notes de cours de Cédric Beaulac,
