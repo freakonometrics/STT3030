@@ -28,6 +28,7 @@ selon [UQAM](https://etudier.uqam.ca/cours?sigle=STT3030), les préalables sont 
 * Lab4: [lab4.R](/lab/lab4.R)
 * Lab5: [lab5.R](/lab/lab5.R), [energy.xlsx](/data/energy.xlsx)
 * Lab6: [intra.Rmd](/lab/intra-exo-1.Rmd), [lab6.R](/lab/lab6.R),
+* Lab7: [lab7.R](/lab/lab7.R),
 
 **Cours**
 Les notes de cours sont très librement inspirées des notes de cours de Cédric Beaulac,
@@ -37,3 +38,4 @@ Les notes de cours sont très librement inspirées des notes de cours de Cédric
 * Cours4: [cours4.pdf](/docs/STT3030-4.pdf),
 * Cours5: [cours5.pdf](/docs/STT3030-5.pdf),
 * Cours6: [cours0.pdf](/docs/STT3030-0.pdf) rappels sur la régression logistique, [cours6.pdf](/docs/STT3030-6.pdf),
+* Cours7: [cours7.pdf](/docs/STT3030-7.pdf),
