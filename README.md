@@ -42,4 +42,4 @@ Les notes de cours sont très librement inspirées des notes de cours de Cédric
 * Cours6: [cours0.pdf](/docs/STT3030-0.pdf) rappels sur la régression logistique, [cours6.pdf](/docs/STT3030-6.pdf),
 * Cours7: [cours7.pdf](/docs/STT3030-7.pdf),
 * Cours8: [cours8.pdf](/docs/STT3030-8.pdf),
-* Cours9: [cours8.pdf](/docs/STT3030-9.pdf),
+* Cours9: [cours9.pdf](/docs/STT3030-9.pdf),
