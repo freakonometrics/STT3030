@@ -32,7 +32,9 @@ selon [UQAM](https://etudier.uqam.ca/cours?sigle=STT3030), les préalables sont 
 * Lab8: [lab8.R](/lab/Lab8.R),
 * Lab9: [lab9.R](/lab/lab9.R),
 * Lab10: [lab10.R](/lab/lab10.R),
-
+* Lab11: [lab11.R](/lab/lab11.R),
+* Lab12: [lab12.R](/lab/lab12.R),
+  
 **Cours**
 Les notes de cours sont très librement inspirées des notes de cours de Cédric Beaulac, mais librement adaptées
 * Cours1: [cours1.pdf](/docs/STT3030-1.pdf),
