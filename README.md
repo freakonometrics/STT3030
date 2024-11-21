@@ -46,3 +46,4 @@ Les notes de cours sont très librement inspirées des notes de cours de Cédric
 * Cours9: [cours9.pdf](/docs/STT3030-9.pdf),
 * Cours10: [cours10.pdf](/docs/STT3030-10.pdf),
 * Cours11: [cours11.pdf](/docs/STT3030-11.pdf),
+* Cours12: [cours12.pdf](/docs/STT3030-12.pdf),
